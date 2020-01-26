@@ -16,7 +16,7 @@ export const FORM_FIELD = {
 }
 
 export const PICKER_SOURCE = {
-  GENDER: ['Male', 'Female'],
+  LOCALITY: ['Chennai', 'Bangalore', 'Hydrabad', 'Mumbai', 'Delhi'],
   CLASS: ['Pre KG', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'],
   SECTION: ['A', 'B', 'C', 'D', 'E']
 }
@@ -31,7 +31,7 @@ export default class RegistrationPage extends React.Component {
     super(props);
     this.state = {
       data: [],
-      selectedGender: -1,
+      selectedLocality: -1,
       selectedClass: -1,
       selectedSection: -1,
       currentPickerField: null,
@@ -108,8 +108,21 @@ export default class RegistrationPage extends React.Component {
 
 
       case FORM_FIELD.LOCALITY:
-        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
-        />)
+        return (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              this.setState({ currentPickerField: FORM_FIELD.LOCALITY })
+              setTimeout(() => {
+                this.pickerRef.show()
+              }, 500)
+
+            }}
+          >
+            <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
+              <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
+            </View>
+          </TouchableWithoutFeedback>
+        )
       case FORM_FIELD.NO_OF_GUESTS:
         return (<TextInput style={styles.inputWithBorder} keyboardType={'phone-pad'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
         />)
@@ -119,21 +132,21 @@ export default class RegistrationPage extends React.Component {
         />)
 
       // case FORM_FIELD.CLASS:
-      //   return (
-      //     <TouchableWithoutFeedback
-      //       onPress={() => {
-      //         this.setState({ currentPickerField: FORM_FIELD.CLASS })
-      //         setTimeout(() => {
-      //           this.pickerRef.show()
-      //         }, 500)
+        // return (
+        //   <TouchableWithoutFeedback
+        //     onPress={() => {
+        //       this.setState({ currentPickerField: FORM_FIELD.CLASS })
+        //       setTimeout(() => {
+        //         this.pickerRef.show()
+        //       }, 500)
 
-      //       }}
-      //     >
-      //       <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
-      //         <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
-      //       </View>
-      //     </TouchableWithoutFeedback>
-      //   )
+        //     }}
+        //   >
+        //     <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
+        //       <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
+        //     </View>
+        //   </TouchableWithoutFeedback>
+        // )
 
 
       // case FORM_FIELD.SECTION:
@@ -163,8 +176,8 @@ export default class RegistrationPage extends React.Component {
   _getPickerItems() {
     if (!isEmpty(this.state.currentPickerField)) {
       switch (this.state.currentPickerField) {
-        case FORM_FIELD.GENDER:
-          return PICKER_SOURCE.GENDER
+        case FORM_FIELD.LOCALITY:
+          return PICKER_SOURCE.LOCALITY
         case FORM_FIELD.CLASS:
           return PICKER_SOURCE.CLASS
         case FORM_FIELD.SECTION:
@@ -182,8 +195,8 @@ export default class RegistrationPage extends React.Component {
 
   selectedValue() {
     switch (this.state.currentPickerField) {
-      case FORM_FIELD.GENDER:
-        return this.state.selectedGender
+      case FORM_FIELD.LOCALITY:
+        return this.state.selectedLocality
       case FORM_FIELD.CLASS:
         return this.state.selectedClass
       case FORM_FIELD.SECTION:
@@ -202,8 +215,8 @@ export default class RegistrationPage extends React.Component {
       items={this._getPickerItems()}
       onValueChange={(index) => {
         switch (this.state.currentPickerField) {
-          case FORM_FIELD.GENDER:
-            this.setState({ selectedGender: index })
+          case FORM_FIELD.LOCALITY:
+            this.setState({ selectedLocality: index })
             break
           case FORM_FIELD.CLASS:
             this.setState({ selectedClass: index })
