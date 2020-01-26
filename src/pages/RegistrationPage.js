@@ -1,15 +1,337 @@
 import * as React from 'react';
-import { Button, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableWithoutFeedback, FlatList, Dimensions, Keyboard } from 'react-native';
+import { COLORS } from '../Config'
+import { isEmpty } from 'lodash'
+import ReactNativePickerModule from 'react-native-picker-module'
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import moment from "moment";
+
+
+export const FORM_FIELD = {
+  NAME: 'Name',
+  DOB: 'Date of birth',
+  LOCALITY: 'Locality',
+  NO_OF_GUESTS: 'No of guests',
+  ADDRESS: 'Address',
+}
+
+export const PICKER_SOURCE = {
+  GENDER: ['Male', 'Female'],
+  CLASS: ['Pre KG', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'],
+  SECTION: ['A', 'B', 'C', 'D', 'E']
+}
+const { width, height } = Dimensions.get("window")
 export default class RegistrationPage extends React.Component {
-      render() {
+
+  static navigationOptions = {
+    title: 'Registration',
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+      selectedGender: -1,
+      selectedClass: -1,
+      selectedSection: -1,
+      currentPickerField: null,
+      isDateTimePickerVisible: false,
+      selectedDate: null
+    }
+  }
+
+  componentDidMount() {
+    const list = [
+      { key: FORM_FIELD.NAME },
+      { key: FORM_FIELD.DOB },
+      { key: FORM_FIELD.LOCALITY },
+      { key: FORM_FIELD.NO_OF_GUESTS},
+      { key: FORM_FIELD.ADDRESS }
+    ]
+    this.setState({ data: list })
+
+
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this._keyboardDidHide
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidShow = (e) => {
+    this.setState({ keyboardHeight: e.endCoordinates.height })
+  }
+
+  _keyboardDidHide = () => {
+
+    this.setState({ keyboardHeight: 0 })
+  }
+
+  _keyExtractor = (item, index) => index.toString();
+
+  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+
+  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+  _handleDatePicked = (date) => {
+    const dt = moment(date).format("DD/MM/YYYY")
+    this.setState({ selectedDate: dt })
+    this._hideDateTimePicker();
+  };
+
+
+  _renderItem = ({ item }) => {
+    switch (item.key) {
+      case FORM_FIELD.NAME:
+        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        />)
+      case FORM_FIELD.DOB:
         return (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen</Text>
-            <Button
-              title="Go to Details"
-              onPress={() => this.props.navigation.navigate('SearchPage')}
-            />
-          </View>
-        );
+          <TouchableWithoutFeedback
+            onPress={() => {
+              this._showDateTimePicker()
+            }}
+          >
+            <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
+              <Text style={this.state.selectedDate ? styles.fillText : styles.placeHolder}>{this.state.selectedDate ? this.state.selectedDate : item.key}</Text>
+            </View>
+          </TouchableWithoutFeedback>
+        )
+
+
+      case FORM_FIELD.LOCALITY:
+        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        />)
+      case FORM_FIELD.NO_OF_GUESTS:
+        return (<TextInput style={styles.inputWithBorder} keyboardType={'phone-pad'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        />)
+
+      case FORM_FIELD.ADDRESS:
+        return (<TextInput style={styles.inputWithBorder} keyboardType={'numeric'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        />)
+
+      // case FORM_FIELD.CLASS:
+      //   return (
+      //     <TouchableWithoutFeedback
+      //       onPress={() => {
+      //         this.setState({ currentPickerField: FORM_FIELD.CLASS })
+      //         setTimeout(() => {
+      //           this.pickerRef.show()
+      //         }, 500)
+
+      //       }}
+      //     >
+      //       <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
+      //         <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
+      //       </View>
+      //     </TouchableWithoutFeedback>
+      //   )
+
+
+      // case FORM_FIELD.SECTION:
+      //   return (
+      //     <TouchableWithoutFeedback
+      //       onPress={() => {
+      //         this.setState({ currentPickerField: FORM_FIELD.SECTION })
+      //         setTimeout(() => {
+      //           this.pickerRef.show()
+      //         }, 500)
+      //       }}
+      //     >
+      //       <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
+      //         <Text style={(this.state.selectedSection >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedSection >= 0) ? this._getPickerValue(this.state.selectedSection, FORM_FIELD.SECTION) : item.key}</Text>
+      //       </View>
+      //     </TouchableWithoutFeedback>
+      //   )
+
+
+      default:
+        return <View />
+    }
+    //     return <View/>
+  }
+
+
+  _getPickerItems() {
+    if (!isEmpty(this.state.currentPickerField)) {
+      switch (this.state.currentPickerField) {
+        case FORM_FIELD.GENDER:
+          return PICKER_SOURCE.GENDER
+        case FORM_FIELD.CLASS:
+          return PICKER_SOURCE.CLASS
+        case FORM_FIELD.SECTION:
+          return PICKER_SOURCE.SECTION
+        default:
+          return []
+
       }
     }
+    else {
+      return []
+    }
+
+  }
+
+  selectedValue() {
+    switch (this.state.currentPickerField) {
+      case FORM_FIELD.GENDER:
+        return this.state.selectedGender
+      case FORM_FIELD.CLASS:
+        return this.state.selectedClass
+      case FORM_FIELD.SECTION:
+        return this.state.selectedSection
+      default:
+        return 0
+    }
+  }
+
+  _showPicker() {
+
+    return (<ReactNativePickerModule
+      pickerRef={e => this.pickerRef = e}
+      value={this.selectedValue()}
+      title={"Select a item"}
+      items={this._getPickerItems()}
+      onValueChange={(index) => {
+        switch (this.state.currentPickerField) {
+          case FORM_FIELD.GENDER:
+            this.setState({ selectedGender: index })
+            break
+          case FORM_FIELD.CLASS:
+            this.setState({ selectedClass: index })
+            break
+          case FORM_FIELD.SECTION:
+            this.setState({ selectedSection: index })
+            break
+        }
+      }} />)
+  }
+
+  _getPickerValue(index, currentSelectedField) {
+    switch (currentSelectedField) {
+      case FORM_FIELD.GENDER:
+        return PICKER_SOURCE.GENDER[index]
+      case FORM_FIELD.CLASS:
+        return PICKER_SOURCE.CLASS[index]
+      case FORM_FIELD.SECTION:
+        return PICKER_SOURCE.SECTION[index]
+      default:
+        return ''
+    }
+  }
+
+
+  render() {
+    // console.log('this.state.keyboardHeight', this.state.keyboardHeight, (height - 260 - this.state.keyboardHeight))
+    return (
+      <View style={styles.container}>
+        {this._showPicker()}
+        <DateTimePicker
+          isVisible={this.state.isDateTimePickerVisible}
+          onConfirm={this._handleDatePicked}
+          onCancel={this._hideDateTimePicker}
+        />
+      
+        {!isEmpty(this.state.data) && <FlatList
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          style={[styles.list, this.state.keyboardHeight > 0 ? { height: (height - 260 - this.state.keyboardHeight) } : {}]}
+          keyExtractor={this._keyExtractor}
+          data={this.state.data}
+          extraData={this.state}
+          renderItem={this._renderItem}
+        />
+        }
+      </View>)
+  }
+}
+
+
+const styles = StyleSheet.create({
+  container: {
+        flex: 1,
+        backgroundColor: COLORS.MESSAGE_PAGE.BACKGROUND_COLOR
+  },
+
+  header: {
+        marginLeft: 0,
+        marginRight: 0,
+        height: 64,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        backgroundColor: COLORS.PRIMARY_COLOR
+  },
+  textContainer: {
+        flexGrow: 1,
+        marginTop: 10,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        // marginTop: 23,
+  },
+  title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: COLORS.ACCENT_COLOR,
+        textAlign: "center",
+  },
+  list: { "flex": 1, marginLeft: 20, marginRight: 20 },
+  profileContainer: {
+        height: 120,
+        alignItems: 'center',
+        justifyContent: 'center'
+  },
+  profile: {
+        height: 80,
+        width: 80
+  },
+  inputWithBorder: {
+        height: 50,
+        borderBottomWidth: 1,
+        borderColor: '#C2CBD3',
+        fontSize: 14
+
+  },
+  pickerFullContainer: {
+        'zIndex': 22,
+        position: 'absolute',
+        marginTop: 64,
+        height: (height - 120),
+        width: width,
+        marginLeft: 0,
+        marginRight: 0,
+        backgroundColor: "rgba(130, 130, 130, 0.9)"
+  },
+  pickerContainer: {
+        flex: 1,
+        justifyContent: "center",
+        margin: 30
+  },
+  pickerCloseText: {
+        height: 22,
+        marginTop: 11,
+        marginRight: 20,
+        textAlign: 'right',
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.PRIMARY_COLOR
+  },
+  placeHolder: { textAlign: "left", color: '#828282', fontSize: 14 },
+  fillText: { textAlign: "left", color: '#000000', fontSize: 14 },
+  doneIcon:{
+              width: 40,
+               height: 40,
+               marginTop : 12,
+              marginRight: 20 
+        
+  }
+
+})
