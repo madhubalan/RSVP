@@ -17,8 +17,6 @@ export const FORM_FIELD = {
 
 export const PICKER_SOURCE = {
   LOCALITY: ['Chennai', 'Bangalore', 'Hydrabad', 'Mumbai', 'Delhi'],
-  CLASS: ['Pre KG', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'],
-  SECTION: ['A', 'B', 'C', 'D', 'E']
 }
 const { width, height } = Dimensions.get("window")
 export default class RegistrationPage extends React.Component {
@@ -31,9 +29,7 @@ export default class RegistrationPage extends React.Component {
     super(props);
     this.state = {
       data: [],
-      selectedLocality: -1,
-      selectedClass: -1,
-      selectedSection: -1,
+      selectedLocality: "",
       currentPickerField: null,
       isDateTimePickerVisible: false,
       selectedDate: null
@@ -91,7 +87,7 @@ export default class RegistrationPage extends React.Component {
   _renderItem = ({ item }) => {
     switch (item.key) {
       case FORM_FIELD.NAME:
-        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'}  paddingLeft={12} underlineColorAndroid='transparent'
         />)
       case FORM_FIELD.DOB:
         return (
@@ -119,57 +115,21 @@ export default class RegistrationPage extends React.Component {
             }}
           >
             <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
-              <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
+              <Text style={ !isEmpty(this.state.selectedLocality) ? styles.fillText : styles.placeHolder}>{!isEmpty(this.state.selectedLocality) ? this.state.selectedLocality : item.key}</Text>
             </View>
           </TouchableWithoutFeedback>
         )
       case FORM_FIELD.NO_OF_GUESTS:
-        return (<TextInput style={styles.inputWithBorder} keyboardType={'phone-pad'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        return (<TextInput paddingLeft={12} style={styles.inputWithBorder} keyboardType={'phone-pad'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
         />)
 
       case FORM_FIELD.ADDRESS:
-        return (<TextInput style={styles.inputWithBorder} keyboardType={'numeric'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
+        return (<TextInput paddingLeft={12} style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
         />)
-
-      // case FORM_FIELD.CLASS:
-        // return (
-        //   <TouchableWithoutFeedback
-        //     onPress={() => {
-        //       this.setState({ currentPickerField: FORM_FIELD.CLASS })
-        //       setTimeout(() => {
-        //         this.pickerRef.show()
-        //       }, 500)
-
-        //     }}
-        //   >
-        //     <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
-        //       <Text style={(this.state.selectedClass >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedClass >= 0) ? this._getPickerValue(this.state.selectedClass, FORM_FIELD.CLASS) : item.key}</Text>
-        //     </View>
-        //   </TouchableWithoutFeedback>
-        // )
-
-
-      // case FORM_FIELD.SECTION:
-      //   return (
-      //     <TouchableWithoutFeedback
-      //       onPress={() => {
-      //         this.setState({ currentPickerField: FORM_FIELD.SECTION })
-      //         setTimeout(() => {
-      //           this.pickerRef.show()
-      //         }, 500)
-      //       }}
-      //     >
-      //       <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
-      //         <Text style={(this.state.selectedSection >= 0) ? styles.fillText : styles.placeHolder}>{(this.state.selectedSection >= 0) ? this._getPickerValue(this.state.selectedSection, FORM_FIELD.SECTION) : item.key}</Text>
-      //       </View>
-      //     </TouchableWithoutFeedback>
-      //   )
-
 
       default:
         return <View />
     }
-    //     return <View/>
   }
 
 
@@ -196,7 +156,7 @@ export default class RegistrationPage extends React.Component {
   selectedValue() {
     switch (this.state.currentPickerField) {
       case FORM_FIELD.LOCALITY:
-        return this.state.selectedLocality
+        return  PICKER_SOURCE.LOCALITY.indexOf(this.state.selectedLocality) 
       case FORM_FIELD.CLASS:
         return this.state.selectedClass
       case FORM_FIELD.SECTION:
@@ -228,22 +188,7 @@ export default class RegistrationPage extends React.Component {
       }} />)
   }
 
-  _getPickerValue(index, currentSelectedField) {
-    switch (currentSelectedField) {
-      case FORM_FIELD.GENDER:
-        return PICKER_SOURCE.GENDER[index]
-      case FORM_FIELD.CLASS:
-        return PICKER_SOURCE.CLASS[index]
-      case FORM_FIELD.SECTION:
-        return PICKER_SOURCE.SECTION[index]
-      default:
-        return ''
-    }
-  }
-
-
   render() {
-    // console.log('this.state.keyboardHeight', this.state.keyboardHeight, (height - 260 - this.state.keyboardHeight))
     return (
       <View style={styles.container}>
         {this._showPicker()}
@@ -268,6 +213,8 @@ export default class RegistrationPage extends React.Component {
 }
 
 
+
+
 const styles = StyleSheet.create({
   container: {
         flex: 1,
@@ -284,11 +231,10 @@ const styles = StyleSheet.create({
   },
   textContainer: {
         flexGrow: 1,
-        marginTop: 10,
+        marginTop: 12,
         height: 44,
         alignItems: 'center',
         justifyContent: 'center',
-        // marginTop: 23,
   },
   title: {
         fontSize: 22,
@@ -307,6 +253,8 @@ const styles = StyleSheet.create({
         width: 80
   },
   inputWithBorder: {
+        backgroundColor : 'red',
+        marginTop : 10,
         height: 50,
         borderBottomWidth: 1,
         borderColor: '#C2CBD3',
@@ -337,8 +285,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.PRIMARY_COLOR
   },
-  placeHolder: { textAlign: "left", color: '#828282', fontSize: 14 },
-  fillText: { textAlign: "left", color: '#000000', fontSize: 14 },
+  placeHolder: { marginLeft : 12, textAlign: "left", color: '#828282', fontSize: 14 },
+  fillText: { marginLeft : 12, textAlign: "left", color: '#000000', fontSize: 14 },
   doneIcon:{
               width: 40,
                height: 40,
