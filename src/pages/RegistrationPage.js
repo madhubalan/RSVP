@@ -1,7 +1,16 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableWithoutFeedback, TouchableOpacity, FlatList, Dimensions, Keyboard } from 'react-native';
+import { StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableWithoutFeedback, 
+  TouchableOpacity, 
+  FlatList, 
+  Dimensions, 
+  Keyboard } from 'react-native';
 import { COLORS } from '../Config'
 import { isEmpty } from 'lodash'
+import MeetupHeader from '../components/MeetupHeader'
 import NumericInput from 'react-native-numeric-input'
 import ReactNativePickerModule from 'react-native-picker-module'
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -9,6 +18,8 @@ import moment from "moment";
 
 
 export const FORM_FIELD = {
+  HEADER: 'Header',
+  SECTION_HEADER: 'Sectoin header',
   NAME: 'Name',
   DOB: 'Date of birth',
   LOCALITY: 'Locality',
@@ -39,6 +50,8 @@ export default class RegistrationPage extends React.Component {
 
   componentDidMount() {
     const list = [
+      {key: FORM_FIELD.HEADER},
+      {key: FORM_FIELD.SECTION_HEADER},
       { key: FORM_FIELD.NAME },
       { key: FORM_FIELD.DOB },
       { key: FORM_FIELD.LOCALITY },
@@ -87,9 +100,16 @@ export default class RegistrationPage extends React.Component {
 
   _renderItem = ({ item }) => {
     switch (item.key) {
+      case FORM_FIELD.HEADER:
+        return <MeetupHeader name={'Js'} company = {'Google'} date = {'9 Feb 2020'} location = {'Chennai'}/>
+
+      case FORM_FIELD.SECTION_HEADER:
+        return <Text style={styles.sectionHeader}>Attendee details</Text>
+
       case FORM_FIELD.NAME:
         return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} paddingLeft={12} underlineColorAndroid='transparent'
         />)
+
       case FORM_FIELD.DOB:
         return (
           <TouchableWithoutFeedback
@@ -102,7 +122,6 @@ export default class RegistrationPage extends React.Component {
             </View>
           </TouchableWithoutFeedback>
         )
-
 
       case FORM_FIELD.LOCALITY:
         return (
@@ -120,6 +139,7 @@ export default class RegistrationPage extends React.Component {
             </View>
           </TouchableWithoutFeedback>
         )
+
       case FORM_FIELD.NO_OF_GUESTS:
         return (<View style={[styles.inputWithBorder, { justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', }]}>
           <Text style={styles.placeHolder}>{item.key}</Text>
@@ -200,10 +220,10 @@ export default class RegistrationPage extends React.Component {
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}
         />
-        <Text style={styles.sectionHeader}>Attendee details</Text>
         {!isEmpty(this.state.data) && <FlatList
           showsVerticalScrollIndicator={false}
-          bounces={false}
+          contentContainerStyle = {{padding : 20}}
+          bounces={true}
           style={[styles.list, this.state.keyboardHeight > 0 ? { height: (height - 260 - this.state.keyboardHeight) } : {}]}
           keyExtractor={this._keyExtractor}
           data={this.state.data}
@@ -224,12 +244,10 @@ export default class RegistrationPage extends React.Component {
   }
 }
 
-
-
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor : 'white'
   },
 
   header: {
@@ -238,7 +256,7 @@ const styles = StyleSheet.create({
     height: 64,
     flexDirection: "row",
     justifyContent: "flex-start",
-    backgroundColor: COLORS.PRIMARY_COLOR
+    // backgroundColor: COLORS.PRIMARY_COLOR
   },
   textContainer: {
     flexGrow: 1,
@@ -253,7 +271,7 @@ const styles = StyleSheet.create({
     color: COLORS.ACCENT_COLOR,
     textAlign: "center",
   },
-  list: { "flex": 1, marginLeft: 20, marginRight: 20 },
+  list: { "flex": 1},
   profileContainer: {
     height: 120,
     alignItems: 'center',
@@ -310,5 +328,5 @@ const styles = StyleSheet.create({
     height: 51, backgroundColor: '#6599ED', alignItems: 'center',
     justifyContent: 'center'
   },
-  sectionHeader: { marginLeft: 20, marginTop: 12, fontSize: 16, fontWeight: 'bold' }
+  sectionHeader: { marginTop: 20, fontSize: 16, fontWeight: 'bold' }
 })
