@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableWithoutFeedback, FlatList, Dimensions, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableWithoutFeedback, TouchableOpacity, FlatList, Dimensions, Keyboard } from 'react-native';
 import { COLORS } from '../Config'
 import { isEmpty } from 'lodash'
+import NumericInput from 'react-native-numeric-input'
 import ReactNativePickerModule from 'react-native-picker-module'
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from "moment";
@@ -41,7 +42,7 @@ export default class RegistrationPage extends React.Component {
       { key: FORM_FIELD.NAME },
       { key: FORM_FIELD.DOB },
       { key: FORM_FIELD.LOCALITY },
-      { key: FORM_FIELD.NO_OF_GUESTS},
+      { key: FORM_FIELD.NO_OF_GUESTS },
       { key: FORM_FIELD.ADDRESS }
     ]
     this.setState({ data: list })
@@ -87,7 +88,7 @@ export default class RegistrationPage extends React.Component {
   _renderItem = ({ item }) => {
     switch (item.key) {
       case FORM_FIELD.NAME:
-        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'}  paddingLeft={12} underlineColorAndroid='transparent'
+        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} paddingLeft={12} underlineColorAndroid='transparent'
         />)
       case FORM_FIELD.DOB:
         return (
@@ -115,16 +116,18 @@ export default class RegistrationPage extends React.Component {
             }}
           >
             <View style={[styles.inputWithBorder, { justifyContent: 'center' }]}>
-              <Text style={ !isEmpty(this.state.selectedLocality) ? styles.fillText : styles.placeHolder}>{!isEmpty(this.state.selectedLocality) ? this.state.selectedLocality : item.key}</Text>
+              <Text style={!isEmpty(this.state.selectedLocality) ? styles.fillText : styles.placeHolder}>{!isEmpty(this.state.selectedLocality) ? this.state.selectedLocality : item.key}</Text>
             </View>
           </TouchableWithoutFeedback>
         )
       case FORM_FIELD.NO_OF_GUESTS:
-        return (<TextInput paddingLeft={12} style={styles.inputWithBorder} keyboardType={'phone-pad'} placeholder={item.key} placeholderTextColor={'#828282'} underlineColorAndroid='transparent'
-        />)
+        return (<View style={[styles.inputWithBorder, { justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', }]}>
+          <Text style={styles.placeHolder}>{item.key}</Text>
+          <NumericInput minValue={0} maxValue={2} totalHeight={50} leftButtonBackgroundColor="#6599ED" rightButtonBackgroundColor="#6599ED" borderColor="transparent" onChange={value => console.log(value)} />
+        </View>)
 
       case FORM_FIELD.ADDRESS:
-        return (<TextInput paddingLeft={12} style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
+        return (<TextInput paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
         />)
 
       default:
@@ -156,7 +159,7 @@ export default class RegistrationPage extends React.Component {
   selectedValue() {
     switch (this.state.currentPickerField) {
       case FORM_FIELD.LOCALITY:
-        return  PICKER_SOURCE.LOCALITY.indexOf(this.state.selectedLocality) 
+        return PICKER_SOURCE.LOCALITY.indexOf(this.state.selectedLocality)
       case FORM_FIELD.CLASS:
         return this.state.selectedClass
       case FORM_FIELD.SECTION:
@@ -197,7 +200,7 @@ export default class RegistrationPage extends React.Component {
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}
         />
-      
+        <Text style={styles.sectionHeader}>Attendee details</Text>
         {!isEmpty(this.state.data) && <FlatList
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -208,6 +211,15 @@ export default class RegistrationPage extends React.Component {
           renderItem={this._renderItem}
         />
         }
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => {
+            console.log('button on click')
+          }}
+        >
+          <Text style={styles.buttonText}>Join</Text>
+        </TouchableOpacity>
+
       </View>)
   }
 }
@@ -217,82 +229,86 @@ export default class RegistrationPage extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-        flex: 1,
-        backgroundColor: COLORS.MESSAGE_PAGE.BACKGROUND_COLOR
+    flex: 1
   },
 
   header: {
-        marginLeft: 0,
-        marginRight: 0,
-        height: 64,
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        backgroundColor: COLORS.PRIMARY_COLOR
+    marginLeft: 0,
+    marginRight: 0,
+    height: 64,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    backgroundColor: COLORS.PRIMARY_COLOR
   },
   textContainer: {
-        flexGrow: 1,
-        marginTop: 12,
-        height: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
+    flexGrow: 1,
+    marginTop: 12,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: COLORS.ACCENT_COLOR,
-        textAlign: "center",
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: COLORS.ACCENT_COLOR,
+    textAlign: "center",
   },
   list: { "flex": 1, marginLeft: 20, marginRight: 20 },
   profileContainer: {
-        height: 120,
-        alignItems: 'center',
-        justifyContent: 'center'
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   profile: {
-        height: 80,
-        width: 80
+    height: 80,
+    width: 80
   },
   inputWithBorder: {
-        backgroundColor : 'red',
-        marginTop : 10,
-        height: 50,
-        borderBottomWidth: 1,
-        borderColor: '#C2CBD3',
-        fontSize: 14
+    marginTop: 12,
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#C2CBD3',
+    borderRadius: 4,
+    fontSize: 16
 
   },
   pickerFullContainer: {
-        'zIndex': 22,
-        position: 'absolute',
-        marginTop: 64,
-        height: (height - 120),
-        width: width,
-        marginLeft: 0,
-        marginRight: 0,
-        backgroundColor: "rgba(130, 130, 130, 0.9)"
+    'zIndex': 22,
+    position: 'absolute',
+    marginTop: 64,
+    height: (height - 120),
+    width: width,
+    marginLeft: 0,
+    marginRight: 0,
+    backgroundColor: "rgba(130, 130, 130, 0.9)"
   },
   pickerContainer: {
-        flex: 1,
-        justifyContent: "center",
-        margin: 30
+    flex: 1,
+    justifyContent: "center",
+    margin: 30
   },
   pickerCloseText: {
-        height: 22,
-        marginTop: 11,
-        marginRight: 20,
-        textAlign: 'right',
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: COLORS.PRIMARY_COLOR
+    height: 22,
+    marginTop: 11,
+    marginRight: 20,
+    textAlign: 'right',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.PRIMARY_COLOR
   },
-  placeHolder: { marginLeft : 12, textAlign: "left", color: '#828282', fontSize: 14 },
-  fillText: { marginLeft : 12, textAlign: "left", color: '#000000', fontSize: 14 },
-  doneIcon:{
-              width: 40,
-               height: 40,
-               marginTop : 12,
-              marginRight: 20 
-        
-  }
+  placeHolder: { marginLeft: 12, textAlign: "left", color: '#828282', fontSize: 16 },
+  fillText: { marginLeft: 12, textAlign: "left", color: '#000000', fontSize: 16 },
+  doneIcon: {
+    width: 40,
+    height: 40,
+    marginTop: 12,
+    marginRight: 20
 
+  },
+  buttonText: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  buttonContainer: {
+    height: 51, backgroundColor: '#6599ED', alignItems: 'center',
+    justifyContent: 'center'
+  },
+  sectionHeader: { marginLeft: 20, marginTop: 12, fontSize: 16, fontWeight: 'bold' }
 })
