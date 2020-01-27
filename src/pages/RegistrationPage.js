@@ -1,13 +1,16 @@
 import * as React from 'react';
-import { StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableWithoutFeedback, 
-  TouchableOpacity, 
-  FlatList, 
-  Dimensions, 
-  Keyboard } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  Keyboard,
+  ActivityIndicator
+} from 'react-native';
 import { COLORS } from '../Config'
 import { isEmpty } from 'lodash'
 import MeetupHeader from '../components/MeetupHeader'
@@ -40,18 +43,23 @@ export default class RegistrationPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoading: false,
       data: [],
       selectedLocality: "",
       currentPickerField: null,
       isDateTimePickerVisible: false,
-      selectedDate: null
+      selectedDate: null,
+      name: "",
+      address: "",
+      noOfGuests: 0
+
     }
   }
 
   componentDidMount() {
     const list = [
-      {key: FORM_FIELD.HEADER},
-      {key: FORM_FIELD.SECTION_HEADER},
+      { key: FORM_FIELD.HEADER },
+      { key: FORM_FIELD.SECTION_HEADER },
       { key: FORM_FIELD.NAME },
       { key: FORM_FIELD.DOB },
       { key: FORM_FIELD.LOCALITY },
@@ -101,13 +109,14 @@ export default class RegistrationPage extends React.Component {
   _renderItem = ({ item }) => {
     switch (item.key) {
       case FORM_FIELD.HEADER:
-        return <MeetupHeader name={'Js'} company = {'Google'} date = {'9 Feb 2020'} location = {'Chennai'}/>
+        return <MeetupHeader name={'Js'} company={'Google'} date={'9 Feb 2020'} location={'Chennai'} />
 
       case FORM_FIELD.SECTION_HEADER:
         return <Text style={styles.sectionHeader}>Attendee details</Text>
 
       case FORM_FIELD.NAME:
         return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} paddingLeft={12} underlineColorAndroid='transparent'
+          onChangeText={text => this.setState({ name: text })}
         />)
 
       case FORM_FIELD.DOB:
@@ -143,11 +152,12 @@ export default class RegistrationPage extends React.Component {
       case FORM_FIELD.NO_OF_GUESTS:
         return (<View style={[styles.inputWithBorder, { justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', }]}>
           <Text style={styles.placeHolder}>{item.key}</Text>
-          <NumericInput minValue={0} maxValue={2} totalHeight={50} leftButtonBackgroundColor="#6599ED" rightButtonBackgroundColor="#6599ED" borderColor="transparent" onChange={value => console.log(value)} />
+          <NumericInput minValue={0} maxValue={2} totalHeight={50} leftButtonBackgroundColor="#6599ED" rightButtonBackgroundColor="#6599ED" borderColor="transparent" onChange={value => this.setState({ noOfGuests: value })} />
         </View>)
 
       case FORM_FIELD.ADDRESS:
         return (<TextInput paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
+          onChangeText={text => this.setState({ address: text })}
         />)
 
       default:
@@ -211,43 +221,90 @@ export default class RegistrationPage extends React.Component {
       }} />)
   }
 
-  render() {
-    return (
-      <View style={styles.container}>
-        {this._showPicker()}
-        <DateTimePicker
-          isVisible={this.state.isDateTimePickerVisible}
-          onConfirm={this._handleDatePicked}
-          onCancel={this._hideDateTimePicker}
-        />
-        {!isEmpty(this.state.data) && <FlatList
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle = {{padding : 20}}
-          bounces={true}
-          style={[styles.list, this.state.keyboardHeight > 0 ? { height: (height - 260 - this.state.keyboardHeight) } : {}]}
-          keyExtractor={this._keyExtractor}
-          data={this.state.data}
-          extraData={this.state}
-          renderItem={this._renderItem}
-        />
-        }
-        <TouchableOpacity
-          style={styles.buttonContainer}
-          onPress={() => {
-            console.log('button on click')
-          }}
-        >
-          <Text style={styles.buttonText}>Join</Text>
-        </TouchableOpacity>
+  isAllTheFieldsFilled() {
+    return !isEmpty(this.state.name) && !isEmpty(this.state.selectedDate) && !isEmpty(this.state.selectedLocality) && !isEmpty(this.state.address)
+  }
 
-      </View>)
+  showLoadingScreen() {
+    return <View style={styles.loaderContainer}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  }
+
+  showLoader = () => this.setState({ isLoading: true })
+
+  hideLoader = () => this.setState({ isLoading: false })
+
+  resetStates() {
+    this.setState({
+      name: '',
+      selectedDate: null,
+      selectedLocality: '',
+      noOfGuests: 0,
+      address: ''
+    })
+
+  }
+
+
+  render() {
+
+    if (this.state.isLoading) {
+      return this.showLoadingScreen()
+    }
+    else {
+      return (
+        <View style={styles.container}>
+          {this._showPicker()}
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerVisible}
+            onConfirm={this._handleDatePicked}
+            onCancel={this._hideDateTimePicker}
+          />
+          {!isEmpty(this.state.data) && <View style={this.state.keyboardHeight > 0 ? { height: height - 64 - this.state.keyboardHeight } : { flex: 1 }}>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ padding: 20 }}
+              bounces={true}
+              style={{ flex: 1 }}
+              keyExtractor={this._keyExtractor}
+              data={this.state.data}
+              extraData={this.state}
+              renderItem={this._renderItem}
+            />
+          </View>
+          }
+          <TouchableOpacity
+            style={this.isAllTheFieldsFilled() ? styles.buttonContainer : styles.disableButtonContainer}
+            onPress={() => {
+              if (this.isAllTheFieldsFilled()) {
+                this.showLoader()
+                setTimeout(() => {
+                  this.props.navigation.navigate('SearchPage');
+                  this.hideLoader()
+                  this.resetStates()
+                }, 500)
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Join</Text>
+          </TouchableOpacity>
+
+        </View>)
+    }
+
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor : 'white'
+    backgroundColor: 'white'
+  },
+
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center'
   },
 
   header: {
@@ -256,7 +313,6 @@ const styles = StyleSheet.create({
     height: 64,
     flexDirection: "row",
     justifyContent: "flex-start",
-    // backgroundColor: COLORS.PRIMARY_COLOR
   },
   textContainer: {
     flexGrow: 1,
@@ -271,7 +327,6 @@ const styles = StyleSheet.create({
     color: COLORS.ACCENT_COLOR,
     textAlign: "center",
   },
-  list: { "flex": 1},
   profileContainer: {
     height: 120,
     alignItems: 'center',
@@ -326,6 +381,10 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   buttonContainer: {
     height: 51, backgroundColor: '#6599ED', alignItems: 'center',
+    justifyContent: 'center'
+  },
+  disableButtonContainer: {
+    height: 51, backgroundColor: '#D6E4FA', alignItems: 'center',
     justifyContent: 'center'
   },
   sectionHeader: { marginTop: 20, fontSize: 16, fontWeight: 'bold' }
