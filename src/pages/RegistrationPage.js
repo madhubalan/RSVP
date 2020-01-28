@@ -38,6 +38,7 @@ export default class RegistrationPage extends React.Component {
 
   static navigationOptions = {
     title: 'Registration',
+    headerBackTitle: ''
   };
   
   /* 1. LIFECYCLE ********************************************************************************************/
@@ -87,13 +88,10 @@ export default class RegistrationPage extends React.Component {
   }
 
   render() {
-
-    if (this.state.isLoading) {
-      return this.showLoadingScreen()
-    }
-    else {
+    
       return (
         <View style={styles.container}>
+          {this.state.isLoading && this.showLoadingScreen()}
           {this._showPicker()}
           <DateTimePicker
             isVisible={this.state.isDateTimePickerVisible}
@@ -120,8 +118,8 @@ export default class RegistrationPage extends React.Component {
                 this.showLoader()
                 setTimeout(() => {
                   this.props.navigation.navigate('SearchPage')
-                  this.hideLoader()
                   this.resetStates()
+                  this.hideLoader()
                 }, 500)
               }
             }}
@@ -130,7 +128,6 @@ export default class RegistrationPage extends React.Component {
           </TouchableOpacity>
 
         </View>)
-    }
 
   }
 
@@ -164,10 +161,10 @@ export default class RegistrationPage extends React.Component {
         return <MeetupHeader name={'Js'} company={'Google'} date={'9 Feb 2020'} location={'Chennai'} />
 
       case FORM_FIELD.SECTION_HEADER:
-        return <Text style={styles.sectionHeader}>Attendee details</Text>
+        return <Text style={styles.sectionHeader}>Attendee details *</Text>
 
       case FORM_FIELD.NAME:
-        return (<TextInput style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} paddingLeft={12} underlineColorAndroid='transparent'
+        return (<TextInput value = {this.state.name} style={styles.inputWithBorder} placeholder={item.key} placeholderTextColor={'#828282'} paddingLeft={12} underlineColorAndroid='transparent'
           onChangeText={text => this.setState({ name: text })}
         />)
 
@@ -203,12 +200,12 @@ export default class RegistrationPage extends React.Component {
 
       case FORM_FIELD.NO_OF_GUESTS:
         return (<View style={[styles.inputWithBorder, { justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', }]}>
-          <Text style={styles.placeHolder}>{item.key}</Text>
+          <Text style={this.state.noOfGuests > 0 ?  styles.selectedPlaceHolder : styles.placeHolder}>{item.key}</Text>
           <NumericInput minValue={0} maxValue={2} totalHeight={50} leftButtonBackgroundColor="#6599ED" rightButtonBackgroundColor="#6599ED" borderColor="transparent" onChange={value => this.setState({ noOfGuests: value })} />
         </View>)
 
       case FORM_FIELD.ADDRESS:
-        return (<TextInput maxLength = {50} paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
+        return (<TextInput value = {this.state.address} maxLength = {50} paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
           onChangeText={text => this.setState({ address: text })}
         />)
 
@@ -235,7 +232,6 @@ export default class RegistrationPage extends React.Component {
     else {
       return []
     }
-
   }
 
   selectedValue() {
@@ -306,8 +302,11 @@ const styles = StyleSheet.create({
   },
 
   loaderContainer: {
-    flex: 1,
-    justifyContent: 'center'
+    position: 'absolute',
+    width : width,
+    height : height,
+    justifyContent: 'center',
+    backgroundColor : 'rgba(256, 256, 256 , 0.9)'
   },
 
   header: {
@@ -373,6 +372,7 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY_COLOR
   },
   placeHolder: { marginLeft: 12, textAlign: "left", color: '#828282', fontSize: 16 },
+  selectedPlaceHolder : { marginLeft: 12, textAlign: "left", color: '#000000', fontSize: 16 },
   fillText: { marginLeft: 12, textAlign: "left", color: '#000000', fontSize: 16 },
   doneIcon: {
     width: 40,

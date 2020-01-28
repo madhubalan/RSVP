@@ -8,6 +8,7 @@ export default class DetailsScreen extends React.Component {
 
   static navigationOptions = {
     title: 'Members',
+    headerBackTitle: null
   };
 
 

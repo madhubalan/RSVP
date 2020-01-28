@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
             marginRight : 20
       },
       details: { flexDirection : 'column', flex : 1 },
-      name : { marginLeft : 20, fontSize : 15, fontWeight : '600', color : '#030050'},
-      locality : { marginLeft : 20, marginTop : 10, fontSize : 10, fontWeight : '600', color : '#9190B3'}
+      name : { marginLeft : 20, fontSize : 18, fontWeight : '600', color : '#030050'},
+      locality : { marginLeft : 20, marginTop : 10, fontSize : 16, fontWeight : '600', color : '#9190B3'}
 
 })

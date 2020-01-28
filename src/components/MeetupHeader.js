@@ -60,11 +60,11 @@ const styles = StyleSheet.create({
             color : 'white'
       },
       detailsContainer:{ flexDirection: 'column', marginLeft : 20 },
-      name:{fontSize : 17, fontWeight: '600', color : '#030050'},
-      company:{ marginTop: 5, fontSize : 10, fontWeight: '600', color : '#8D8CAF'},
+      name:{fontSize : 18, fontWeight: '600', color : '#030050'},
+      company:{ marginTop: 5, fontSize : 12, fontWeight: '600', color : '#8D8CAF'},
       icon:{width : 14, height: 14},
       venueContainer:{ flexDirection: 'row', marginTop : 8},
       date:{ flexDirection: 'row', alignItems: 'center'},
       location : {marginLeft : 5, flexDirection: 'row', alignItems: 'center'},
-      venueText: {fontSize : 10, fontWeight: '600', color : '#030050'}
+      venueText: {fontSize : 12, fontWeight: '600', color : '#030050'}
 })

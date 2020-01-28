@@ -13,15 +13,16 @@ const DETAILS_FIELD = {
 export default class ProfilePage extends React.Component {
 
 
-  componentWillMount(){
+  componentWillMount() {
 
+    // For requre can not pass the variable
     this.list = [
       { key: DETAILS_FIELD.NAME, image: require('../images/ico_person_small.png') },
       { key: DETAILS_FIELD.DOB, image: require('../images/ico_date_light.png') },
       { key: DETAILS_FIELD.LOCALITY, image: require('../images/ico_location_light.png') },
       { key: DETAILS_FIELD.NO_OF_GUESTS, image: require('../images/ico_person_small.png') },
       { key: DETAILS_FIELD.ADDRESS, image: require('../images/ico_address.png') }
-    ] 
+    ]
 
   }
 
@@ -29,8 +30,8 @@ export default class ProfilePage extends React.Component {
 
     return (<View key={index} style={styles.listItem}>
       <Image source={item.image} style={styles.icon} />
-      <Text>{item.key}</Text>
-      <Text>{value}</Text>
+      <Text style={styles.lblText}>{item.key}</Text>
+      <Text style={styles.valueText}>{value}</Text>
     </View>)
   }
   renderItem = (subItem, index) => {
@@ -55,7 +56,10 @@ export default class ProfilePage extends React.Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          <Image source={require("../images/ico_member_white.png")} style={styles.profile} />
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Image source={require("../images/ico_member_white.png")} style={styles.profile} />
+          </View>
+
           <View style={styles.list}>
             {!isEmpty(this.list) ? this.list.map(this.renderItem) : <View />}
           </View>
@@ -68,21 +72,39 @@ export default class ProfilePage extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, backgroundColor: '#FFFFFF'
+    flex: 1, backgroundColor: '#FFFFFF',
   },
   profile: {
+    marginTop : 50,
     width: 82,
     height: 82
   },
   icon: {
-    width: 15,
-    height: 15
+    width: 16,
+    height: 16
   },
   list: {
-    marginLeft: 20,
-    marginRight: 20
+    margin: 20,
+    padding: 20,
+    borderRadius: 8,
+    backgroundColor: '#F9F9F9'
   },
   listItem: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginTop : 10,
+    marginBottom : 10,
+    alignItems: 'center',
+  },
+  lblText: {
+    marginLeft : 10,
+    color: '#9897B8',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  valueText: {
+    marginLeft : 20,
+    color: '#383675',
+    fontSize: 16,
+    fontWeight: '600'
   }
 })

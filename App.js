@@ -14,7 +14,7 @@ const RootStack = createStackNavigator(
     ProfilePage: ProfilePage
   },
   {
-    initialRouteName: 'SearchPage',
+    initialRouteName: 'Home',
   }
 );
 
