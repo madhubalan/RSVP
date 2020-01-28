@@ -2,7 +2,6 @@ import * as React from 'react';
 import { StyleSheet, View, TextInput, Image, FlatList, ActivityIndicator, Dimensions, Keyboard } from 'react-native';
 import {getMembersList} from '../API/APIClient'
 import ListItem from '../components/MemberListItem'
-import {filter} from "lodash"
 
 const { width, height } = Dimensions.get("window")
 export default class DetailsScreen extends React.Component {

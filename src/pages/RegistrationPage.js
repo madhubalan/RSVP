@@ -20,7 +20,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from "moment";
 
 
-export const FORM_FIELD = {
+const FORM_FIELD = {
   HEADER: 'Header',
   SECTION_HEADER: 'Sectoin header',
   NAME: 'Name',
@@ -30,7 +30,7 @@ export const FORM_FIELD = {
   ADDRESS: 'Address',
 }
 
-export const PICKER_SOURCE = {
+const PICKER_SOURCE = {
   LOCALITY: ['Chennai', 'Bangalore', 'Hydrabad', 'Mumbai', 'Delhi'],
 }
 const { width, height } = Dimensions.get("window")
