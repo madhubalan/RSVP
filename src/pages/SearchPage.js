@@ -60,11 +60,13 @@ export default class DetailsScreen extends React.Component {
   }
 
   itemOnClick =(item)=>{
-    console.log(item)
+    this.props.navigation.navigate('ProfilePage',  
+    {
+      item: item
+    })
   }
 
-  _keyExtractor = (item, index) => index.toString();
-
+  _keyExtractor = (item, index) => index.toString()
 
   render() {
 
@@ -80,6 +82,7 @@ export default class DetailsScreen extends React.Component {
         <View style={styles.searchBoxContainer}>
           <Image source={require("../images/ico_search.png")} style={styles.icon} />
           <TextInput inlineImageLeft='search_icon' 
+          autoCorrect = {false}
           placeholder={'Search member'} 
           placeholderTextColor={'#828282'} 
           style={styles.searchBox}

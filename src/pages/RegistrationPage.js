@@ -119,7 +119,7 @@ export default class RegistrationPage extends React.Component {
               if (this.isAllTheFieldsFilled()) {
                 this.showLoader()
                 setTimeout(() => {
-                  this.props.navigation.navigate('SearchPage');
+                  this.props.navigation.navigate('SearchPage')
                   this.hideLoader()
                   this.resetStates()
                 }, 500)
@@ -208,7 +208,7 @@ export default class RegistrationPage extends React.Component {
         </View>)
 
       case FORM_FIELD.ADDRESS:
-        return (<TextInput paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
+        return (<TextInput maxLength = {50} paddingLeft={12} style={[styles.inputWithBorder, { height: 87 }]} placeholder={item.key} placeholderTextColor={'#828282'} multiline={true} underlineColorAndroid='transparent'
           onChangeText={text => this.setState({ address: text })}
         />)
 
