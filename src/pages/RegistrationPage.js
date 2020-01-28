@@ -39,6 +39,8 @@ export default class RegistrationPage extends React.Component {
   static navigationOptions = {
     title: 'Registration',
   };
+  
+  /* 1. LIFECYCLE ********************************************************************************************/
 
   constructor(props) {
     super(props);
@@ -83,6 +85,56 @@ export default class RegistrationPage extends React.Component {
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
   }
+
+  render() {
+
+    if (this.state.isLoading) {
+      return this.showLoadingScreen()
+    }
+    else {
+      return (
+        <View style={styles.container}>
+          {this._showPicker()}
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerVisible}
+            onConfirm={this._handleDatePicked}
+            onCancel={this._hideDateTimePicker}
+          />
+          {!isEmpty(this.state.data) && <View style={this.state.keyboardHeight > 0 ? { height: height - 64 - this.state.keyboardHeight } : { flex: 1 }}>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ padding: 20 }}
+              bounces={true}
+              style={{ flex: 1 }}
+              keyExtractor={this._keyExtractor}
+              data={this.state.data}
+              extraData={this.state}
+              renderItem={this._renderItem}
+            />
+          </View>
+          }
+          <TouchableOpacity
+            style={this.isAllTheFieldsFilled() ? styles.buttonContainer : styles.disableButtonContainer}
+            onPress={() => {
+              if (this.isAllTheFieldsFilled()) {
+                this.showLoader()
+                setTimeout(() => {
+                  this.props.navigation.navigate('SearchPage');
+                  this.hideLoader()
+                  this.resetStates()
+                }, 500)
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Join</Text>
+          </TouchableOpacity>
+
+        </View>)
+    }
+
+  }
+
+  /* 2. UTILS ********************************************************************************************/
 
   _keyboardDidShow = (e) => {
     this.setState({ keyboardHeight: e.endCoordinates.height })
@@ -243,55 +295,6 @@ export default class RegistrationPage extends React.Component {
       noOfGuests: 0,
       address: ''
     })
-
-  }
-
-
-  render() {
-
-    if (this.state.isLoading) {
-      return this.showLoadingScreen()
-    }
-    else {
-      return (
-        <View style={styles.container}>
-          {this._showPicker()}
-          <DateTimePicker
-            isVisible={this.state.isDateTimePickerVisible}
-            onConfirm={this._handleDatePicked}
-            onCancel={this._hideDateTimePicker}
-          />
-          {!isEmpty(this.state.data) && <View style={this.state.keyboardHeight > 0 ? { height: height - 64 - this.state.keyboardHeight } : { flex: 1 }}>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ padding: 20 }}
-              bounces={true}
-              style={{ flex: 1 }}
-              keyExtractor={this._keyExtractor}
-              data={this.state.data}
-              extraData={this.state}
-              renderItem={this._renderItem}
-            />
-          </View>
-          }
-          <TouchableOpacity
-            style={this.isAllTheFieldsFilled() ? styles.buttonContainer : styles.disableButtonContainer}
-            onPress={() => {
-              if (this.isAllTheFieldsFilled()) {
-                this.showLoader()
-                setTimeout(() => {
-                  this.props.navigation.navigate('SearchPage');
-                  this.hideLoader()
-                  this.resetStates()
-                }, 500)
-              }
-            }}
-          >
-            <Text style={styles.buttonText}>Join</Text>
-          </TouchableOpacity>
-
-        </View>)
-    }
 
   }
 }
